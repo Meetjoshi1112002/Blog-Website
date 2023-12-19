@@ -1,0 +1,38 @@
+<%-include("partials/header.ejs") %>
+
+
+<% if(locals.postId){ %>
+
+    <!-- Edit Post form -->
+<div class="create-post-form">
+<h1>Edit Post</h1>
+<form method="post" action="/update">
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" value="<%= title %>" placeholder="title">
+
+    <label for="content">Content:</label>
+    <input type="text" id="content" name="content" value="<%= content %>" placeholder="content">
+    <input type="text" value="<%= postId %>" name="postId" hidden>
+    <button type="submit">Update</button>
+</form>
+</div>
+
+<% }else{  %>
+
+    <!-- Create Post form -->
+<div class="create-post-form">
+<h1>Create Post</h1>
+<form method="post" action="/create/save">
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" placeholder="Enter title">
+
+    <label for="content">Content:</label>
+    <input type="text" id="content" name="content" placeholder="Enter content">
+
+    <button type="submit">Create</button>
+</form>
+</div>
+
+<% } %>
+
+<%-include("partials/footer.ejs") %>

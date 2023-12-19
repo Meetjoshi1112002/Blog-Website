@@ -1,0 +1,23 @@
+<%- include("partials/header.ejs") %>
+
+<% if (posts.length !== 0) { %>
+    <% posts.forEach((post) => { %>
+        <!-- Example blog post -->
+        <div class="blog-post">
+            <div class="post-info"><%= post.time %> <%= post.date %></div>
+
+            <!-- view post anchor tag -->
+            <div class="post-title"> 
+                <a href="/view/<%= posts.indexOf(post) %>"><u><%= post.title %></u></a>
+            </div>
+            <div class="post-content">
+                <!-- Your blog post content goes here -->
+                <%= post.content %>
+            </div>
+        </div>
+    <% }); %>
+<% } else { %>
+    <h1>No Blog yet</h1>
+<% } %>
+
+<%- include("partials/footer.ejs") %>

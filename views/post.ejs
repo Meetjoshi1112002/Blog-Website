@@ -1,0 +1,24 @@
+<%-include("partials/header.ejs") %>
+
+<!-- First div with post content -->
+<div class="post-content-div">
+    <div class="post-title"><%= title %></div>
+    <div class="post-content">
+        <!-- Your post content goes here -->
+        <%= content %>
+    </div>
+</div>
+
+<!-- Second div with Delete and Edit buttons -->
+<div class="action-buttons-div">
+    <form action="/delete" method="post">
+        <input type="text" hidden value="<%= postId %>" name="postId">
+        <button class="delete-button" onclick="handleDel('<%= postId %>')">Delete</button>
+    </form>
+    <button class="edit-button" ><a style="text-decoration: none;" href="/edit/<%= postId %>">Edit</a></button>
+</div>
+
+
+
+
+<%-include("partials/footer.ejs") %>
