@@ -2,8 +2,8 @@
     import bodyParser from "body-parser";
     import {dirname} from "path";
     import { fileURLToPath } from "url";
-
-    const port = 3000;
+    import axios from "axios";
+    const url = "http://localhost:5000"
     const app = express();
     const _dir = dirname(fileURLToPath(import.meta.url));
     app.use(express.static('public'));  //----> For static files of the project
@@ -16,52 +16,27 @@
         next()
     })
     app.use(bodyParser.urlencoded({extended:false}));
-
-    
-    // data structures for the post:
-    let posts = [];
-
-    // class post with contructor:
-    function Post(title,content){
-        this.title = title;
-        this.content = content;
-        this.rawDate =  new Date();
-        this.date = this.rawDate.toLocaleString();
-    }
-
-    // Add the post:
-    const addPost = (title,content)=>{
-        let post = new Post(title,content);
-        posts.push(post);
-    }
-
-    // delete post
-    const delPost = (index)=>{
-        posts.splice(index,1);
-    }
-
-    // Edit post:
-    const editPost = (index,content,title)=>{
-        if(posts[index]){
-            posts[index] = new Post(title,content);
-        }
-    }
-
     // End Points:
 
     // Entry point:
-    app.get("/",(req,res)=>{
-        console.log(posts);
-        res.render(_dir+"/views/index.ejs",{
-            posts:posts
-        })
+    app.get("/",async (req,res)=>{
+        try{
+
+            const response = await axios.get(url);
+            const posts = response.data;
+            res.render(_dir+"/views/index.ejs",{
+                posts:posts
+            })
+        }catch(err){
+            console.log(err.message);
+        }
     })
 
     // view a particular post request:
-    app.get("/view/:id",(req,res)=>{
+    app.get("/view/:id",async (req,res)=>{
         const postId = req.params.id;
-        const p = posts[postId];
-        console.log(p);
+        const response = await axios.get(url+"/blog/"+postId);
+        const p = response.data;
         res.render(_dir+"/views/post.ejs",{
             postId:postId,
             title:p.title,
@@ -70,32 +45,43 @@
     })
 
     // Delete a particular post request:
-    app.post("/delete",(req,res)=>{
+    app.post("/delete",async (req,res)=>{
+        try{
         const id = req.body.postId;
-        delPost(id);
+        const response = await axios.delete(url+"/delete/"+id);  
         res.redirect("/");
+        }catch(errr){
+            console.log(errr.message);
+        }
     })
 
     // Edit request of a particular post:
-    app.get("/edit/:id",(req,res)=>{
+    app.get("/edit/:id",async(req,res)=>{
+        try
+        {
         const id = req.params.id;
-        const p = posts[id];
-        console.log(p);
+        const response = await axios.get(url+"/blog/"+id);
+        const p = response.data;
         res.render(_dir+"/views/createPost.ejs",{
             postId:id,
             title:p.title,
             content:p.content
         })
+        }catch(er){
+            console.log(er);
+        }
     })
 
     // update request for a particular post:
-    app.post("/update",(req,res)=>{
-        const title = req.body.title;
-        const content = req.body.content;
-        const id = req.body.postId;
-        editPost(id,content,title);
-        console.log(id);
-        res.redirect("/");
+    app.post("/update",async(req,res)=>{
+        
+        try{
+            const respnse = await axios.patch(url+"/update",req.body)
+            console.log(respnse.data);
+            res.redirect("/");
+        }catch(error){
+            console.log(error.message);
+        }
     })
 
     // req to create a new post page:
@@ -104,14 +90,20 @@
     })
 
     // req to actually create a post
-    app.post("/create/save",(req,res)=>{
-        const title = req.body.title;
-        const content = req.body.content;
-        addPost(title,content);
+    app.post("/create/save",async (req,res)=>{
+        try{
+
+        const response = await axios.post(url+"/createPost",req.body);
+        console.log(response.data);
         res.redirect("/");
+        }
+        catch(error){
+            console.log(error.message);
+        }
+        
     })
 
+    const port = 3000;
     app.listen(port,()=>{
         console.log(`I am at ${port}`);
-        addPost("What is Lorem Ipsum?","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum");
     })
